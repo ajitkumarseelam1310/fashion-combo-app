@@ -86,26 +86,10 @@ app.get('/api/download/processed', (req, res) => {
 });
 
 app.get('/api/download/accepted', (req, res) => {
-  // const filePath = path.resolve(__dirname, 'accepted.csv');
-  
-  // if (!fs.existsSync(filePath)) {
-  //   return res.status(404).json({ error: 'accepted.csv not found' });
-  // }
-  
-  // res.setHeader('Content-Type', 'text/csv');
-  // res.setHeader('Content-Disposition', 'attachment; filename="accepted.csv"');
-  
-  // res.sendFile(filePath);
-  const ACCEPTED_FILE = path.join(__dirname, 'accepted.csv');
-  if (!fs.existsSync(ACCEPTED_FILE)) {
-    return res.status(404).send('No accepted.csv file found');
-  }
-
+  const csvContent = await exportAcceptedToCsv();
   res.setHeader('Content-Type', 'text/csv');
-  res.setHeader('Content-Disposition', 'attachment; filename="accepted.csv"');
-
-  const fileStream = fs.createReadStream(ACCEPTED_FILE);
-  fileStream.pipe(res);
+  res.setHeader('Content-Disposition', 'attachment; filename=accepted.csv');
+  res.send(csvContent);
 });
 
 
