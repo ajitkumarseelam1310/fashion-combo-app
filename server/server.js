@@ -85,7 +85,7 @@ app.get('/api/download/processed', (req, res) => {
   res.sendFile(filePath);
 });
 
-app.get('/api/download/accepted', (req, res) => {
+app.get('/api/download/accepted', async (req, res) => {
   const csvContent = await exportAcceptedToCsv();
   res.setHeader('Content-Type', 'text/csv');
   res.setHeader('Content-Disposition', 'attachment; filename=accepted.csv');
