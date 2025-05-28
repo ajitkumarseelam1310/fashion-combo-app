@@ -2,7 +2,7 @@
 set -e
 
 echo "📦 Installing frontend dependencies"
-cd ui
+cd UI
 npm install
 
 echo "🌐 Exporting Expo web build"
