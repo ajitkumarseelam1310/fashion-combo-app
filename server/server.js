@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 3000;
 
 // Serve static files
 app.use('/images', express.static('images'));
-const buildPath = path.join(__dirname, '..', 'ui', 'web-build');
+const buildPath = path.join(__dirname, '..', 'UI', 'web-build');
 // app.use(express.static(path.join(__dirname, 'web-build')));
 app.use(express.static(buildPath));
 
