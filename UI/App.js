@@ -3,7 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Image, TouchableOpacity, ScrollView, ActivityIndicator, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
-const API_URL = 'http://localhost:3000/api'; 
+// const API_URL = 'http://localhost:3000/api'; //local
+const API_URL = '/api';
 
 const categories = ['top', 'bottom', 'handbag', 'accessories', 'shoes'];
 
