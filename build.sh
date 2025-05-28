@@ -1,13 +1,16 @@
 #!/bin/bash
-# Root-level build script
+set -e
 
-echo "▶️ Building frontend"
-cd ui
+# Go to project root
+ROOT_DIR=$(pwd)
+
+echo "📦 Installing frontend dependencies"
+cd "$ROOT_DIR/ui"
 npm install
+
+echo "🌐 Exporting Expo web build"
 npx expo export:web
 
-echo "✅ Frontend build complete"
-
-echo "▶️ Building backend"
-cd ../server
+echo "📦 Installing backend dependencies"
+cd "$ROOT_DIR/server"
 npm install
