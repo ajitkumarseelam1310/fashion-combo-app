@@ -80,32 +80,37 @@ async function hasBeenProcessed(combo) {
 
 
 
+async function writeProcessed(combo) {
+  const filePath = path.resolve('processed.csv');
+
+  // Check if file exists and size > 0
+  const fileExists = fs.existsSync(filePath);
+  const fileHasContent = fileExists && fs.statSync(filePath).size > 0;
+
+  const writer = createCsvWriter({
+    path: filePath,
+    header: headers,
+    append: fileHasContent, // append if file has content, else create new with header
+  });
+
+  await writer.writeRecords([formatCombo(combo)]);
+}
 
 async function writeAccepted(combo) {
   const filePath = path.resolve('accepted.csv');
-  ensureHeader(filePath);
+
+  const fileExists = fs.existsSync(filePath);
+  const fileHasContent = fileExists && fs.statSync(filePath).size > 0;
 
   const writer = createCsvWriter({
     path: filePath,
     header: headers,
-    append: true,
+    append: fileHasContent,
   });
 
   await writer.writeRecords([formatCombo(combo)]);
 }
 
-async function writeProcessed(combo) {
-  const filePath = path.resolve('processed.csv');
-  ensureHeader(filePath);
-
-  const writer = createCsvWriter({
-    path: filePath,
-    header: headers,
-    append: true,
-  });
-
-  await writer.writeRecords([formatCombo(combo)]);
-}
 
 function convertToCSV(data) {
   if (data.length === 0) return '';
