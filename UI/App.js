@@ -3,20 +3,19 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Image, TouchableOpacity, ScrollView, ActivityIndicator, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
-// const API_URL = 'http://localhost:3000/api'; //local
- const API_URL = '/api';
-
+// const API_URL = 'http://localhost:3000/api'; // Adjust if needed
+const API_URL = '/api';
 const categories = ['top', 'bottom', 'handbag', 'accessories', 'shoes'];
 
 export default function App() {
   const [images, setImages] = useState({});
-  const [decisions, setDecisions] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [decisionMade, setDecisionMade] = useState(false);
 
   const fetchCombination = async () => {
     setLoading(true);
-    setDecisions({});
+    setDecisionMade(false);
     try {
       const res = await fetch(`${API_URL}/combination`);
       const data = await res.json();
@@ -28,13 +27,19 @@ export default function App() {
     }
   };
 
-  const handleDecision = (cat, value) => {
-    setDecisions(prev => ({ ...prev, [cat]: value }));
-  };
+  // Handle accept or reject for whole combination
+  const handleDecision = async (decision) => {
+    if (decisionMade) return; // prevent double click
+    setDecisionMade(true);
 
-  const handleSubmit = async () => {
+    // Build decisions object for all categories same decision
+    const decisions = {};
+    categories.forEach(cat => {
+      decisions[cat] = decision;
+    });
+
     try {
-      const response = await fetch(`${API_URL}/decision`, {
+      await fetch(`${API_URL}/decision`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -42,14 +47,22 @@ export default function App() {
           decisions,
         }),
       });
-      const data = await response.json();
-      if (!data.error) {
-        setImages(data);
-        setDecisions({});
-      }
+      // Fetch next combo
+      fetchCombination();
     } catch (error) {
       console.error('Submission error:', error);
+      setDecisionMade(false);
     }
+  };
+
+  // Download helper
+
+
+  const handleDownloadBoth = () => {
+    window.open('/api/download/processed', '_blank');
+    setTimeout(() => {
+      window.open('/api/download/accepted', '_blank');
+    }, 100);
   };
 
   useEffect(() => {
@@ -58,46 +71,66 @@ export default function App() {
 
   if (loading) return (
     <View style={styles.loaderContainer}>
-      <ActivityIndicator size="large" color="#000" />
+      <ActivityIndicator size="large" color="#60A5FA" />
+    </View>
+  );
+
+  if (error) return (
+    <View style={styles.loaderContainer}>
+      <Text style={{ color: '#fff' }}>{error}</Text>
     </View>
   );
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
       <View style={styles.header}>
-        <Text style={styles.headerText}>Fashion Combo Review</Text>
+        <Text style={styles.headerText}>Fashion Combo App</Text>
       </View>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.gridContainer}>
-          {categories.map(cat => (
-            <View key={cat} style={styles.card}>
+          {categories.map((cat, i) => (
+            <View
+              key={cat}
+              style={[
+                styles.card,
+                (i === 3 || i === 4) && styles.cardDouble, // last 2 images wider
+              ]}
+            >
               <Image
                 source={{ uri: images[cat]?.url }}
                 style={styles.image}
                 resizeMode="contain"
               />
               <Text style={styles.label}>{cat}</Text>
-              <View style={styles.buttonRow}>
-                <TouchableOpacity onPress={() => handleDecision(cat, 'accept')}>
-                  <Text style={{ color: decisions[cat] === 'accept' ? 'green' : 'gray', fontSize: 20 }}>✔</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleDecision(cat, 'reject')}>
-                  <Text style={{ color: decisions[cat] === 'reject' ? 'red' : 'gray', fontSize: 20 }}>✖</Text>
-                </TouchableOpacity>
-              </View>
             </View>
           ))}
         </View>
-        <View style={styles.submitContainer}>
+
+        <View style={styles.buttonsRow}>
           <TouchableOpacity
-            style={[styles.submitButton, Object.keys(decisions).length < 5 && styles.disabledButton]}
-            onPress={handleSubmit}
-            disabled={Object.keys(decisions).length < 5}
+            style={[styles.decisionButton, styles.rejectButton]}
+            onPress={() => handleDecision('reject')}
+            disabled={decisionMade}
           >
-            <Text style={styles.submitText}>Next</Text>
+            <Text style={styles.decisionText}>Reject</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.decisionButton, styles.acceptButton]}
+            onPress={() => handleDecision('accept')}
+            disabled={decisionMade}
+          >
+            <Text style={styles.decisionText}>Accept</Text>
           </TouchableOpacity>
         </View>
+
+        <View style={styles.downloadContainer}>
+          <TouchableOpacity style={styles.downloadButton} onPress={handleDownloadBoth}>
+            <Text style={styles.downloadText}>Download CSVs</Text>
+          </TouchableOpacity>
+        </View>
+
       </ScrollView>
     </View>
   );
@@ -106,25 +139,28 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff'
+    backgroundColor: '#121212',
   },
   loaderContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#121212',
   },
   header: {
-    padding: 16,
-    backgroundColor: '#E0E7FF',
+    padding: 20,
+    backgroundColor: '#1F2937', // dark slate gray
+    alignItems: 'center',
   },
   headerText: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#4338CA',
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#60A5FA',
   },
   scrollContainer: {
-    padding: 12,
+    paddingHorizontal: 16,
+    paddingTop: 20,
+    paddingBottom: 40,
   },
   gridContainer: {
     flexDirection: 'row',
@@ -133,46 +169,75 @@ const styles = StyleSheet.create({
   },
   card: {
     width: '30%',
-    marginVertical: 8,
-    backgroundColor: '#F3F4F6',
+    marginBottom: 20,
+    backgroundColor: '#1E293B',
+    borderRadius: 14,
     padding: 10,
-    borderRadius: 12,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.8,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
+  },
+  cardDouble: {
+    width: '45%',
   },
   image: {
     width: '100%',
-    height: 200,
-    borderRadius: 8,
-    resizeMode: 'contain'
-  },
-  label: {
-    marginTop: 6,
-    fontWeight: '600',
-    textTransform: 'capitalize',
-    fontSize: 13,
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
-    marginTop: 6,
-  },
-  submitContainer: {
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  submitButton: {
-    backgroundColor: '#4338CA',
-    paddingVertical: 12,
-    paddingHorizontal: 30,
+    height: 160,
     borderRadius: 10,
   },
-  disabledButton: {
-    backgroundColor: '#A5B4FC',
+  label: {
+    marginTop: 8,
+    fontWeight: '600',
+    color: '#cbd5e1',
+    fontSize: 14,
+    textTransform: 'capitalize',
   },
-  submitText: {
+  buttonsRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 10,
+    gap: 40,
+  },
+  decisionButton: {
+    paddingVertical: 14,
+    paddingHorizontal: 48,
+    borderRadius: 12,
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOpacity: 0.35,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 3 },
+  },
+  acceptButton: {
+    backgroundColor: '#16A34A', // green
+  },
+  rejectButton: {
+    backgroundColor: '#DC2626', // red
+  },
+  decisionText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 18,
+  },
+  downloadContainer: {
+    alignItems: 'center',
+    marginTop: 30,
+  },
+  downloadButton: {
+    backgroundColor: '#2563EB',
+    paddingVertical: 14,
+    paddingHorizontal: 48,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.5,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
+  },
+  downloadText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 18,
   },
 });
