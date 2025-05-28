@@ -9,5 +9,5 @@ npx expo export:web
 echo "✅ Frontend build complete"
 
 echo "▶️ Building backend"
-cd ../server
+cd server
 npm install
