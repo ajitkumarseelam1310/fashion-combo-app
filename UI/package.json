@@ -1,0 +1,39 @@
+{
+  "name": "fashion-combo-app",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "@expo/vector-icons": "^14.1.0",
+    "@expo/webpack-config": "~19.0.1",
+    "axios": "^1.9.0",
+    "cors": "^2.8.5",
+    "crypto-browserify": "^3.12.1",
+    "csv-parser": "^3.2.0",
+    "csv-writer": "^1.6.0",
+    "expo": "~50.0.0",
+    "expo-linear-gradient": "^14.1.4",
+    "expo-status-bar": "~1.4.0",
+    "express": "^5.1.0",
+    "fast-csv": "^5.0.2",
+    "nativewind": "^4.1.23",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-native": "0.71.8",
+    "react-native-safe-area-context": "5.4.0",
+    "react-native-web": "0.18.10",
+    "stream-browserify": "^3.0.0",
+    "tailwindcss": "^3.4.17",
+    "vm-browserify": "^1.1.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0",
+    "@types/react": "^18.0.37"
+  },
+  "private": true
+}
