@@ -4,7 +4,7 @@ import { View, Text, Image, TouchableOpacity, ScrollView, ActivityIndicator, Sty
 import { StatusBar } from 'expo-status-bar';
 
 // const API_URL = 'http://localhost:3000/api'; //local
-const API_URL = '/api';
+ const API_URL = '/api';
 
 const categories = ['top', 'bottom', 'handbag', 'accessories', 'shoes'];
 
@@ -75,7 +75,7 @@ export default function App() {
               <Image
                 source={{ uri: images[cat]?.url }}
                 style={styles.image}
-                resizeMode="cover"
+                resizeMode="contain"
               />
               <Text style={styles.label}>{cat}</Text>
               <View style={styles.buttonRow}>
@@ -141,8 +141,9 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: 90,
+    height: 200,
     borderRadius: 8,
+    resizeMode: 'contain'
   },
   label: {
     marginTop: 6,
