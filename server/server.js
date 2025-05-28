@@ -69,20 +69,11 @@ app.post('/api/decision', async (req, res) => {
 
 
 
-app.get('/api/download/processed', (req, res) => {
-  const filePath = path.resolve(__dirname, 'processed.csv');
-  
- 
-  if (!fs.existsSync(filePath)) {
-    return res.status(404).json({ error: 'processed.csv not found' });
-  }
-  
-
+app.get('/api/download/processed', async (req, res) => {
+ const csvContent = await exportProcessedToCsv();
   res.setHeader('Content-Type', 'text/csv');
-  res.setHeader('Content-Disposition', 'attachment; filename="processed.csv"');
-  
-
-  res.sendFile(filePath);
+  res.setHeader('Content-Disposition', 'attachment; filename=accepted.csv');
+  res.send(csvContent);
 });
 
 app.get('/api/download/accepted', async (req, res) => {
