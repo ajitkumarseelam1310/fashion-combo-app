@@ -8,9 +8,14 @@ app.use(cors());
 app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
+console.log('Current __dirname:', __dirname);
+console.log('Current working directory (process.cwd()):', process.cwd());
 
 // Serve static files
-app.use('/images', express.static('images'));
+const imagesPath = path.join(__dirname, '..', 'images');
+console.log('Serving images from:', imagesPath);
+app.use('/images', express.static(imagesPath));
+// app.use('/images', express.static('images'));
 const buildPath = path.join(__dirname, '..', 'UI', 'web-build');
 // app.use(express.static(path.join(__dirname, 'web-build')));
 app.use(express.static(buildPath));
