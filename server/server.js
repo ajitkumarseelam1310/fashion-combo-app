@@ -72,7 +72,7 @@ app.post('/api/decision', async (req, res) => {
 app.get('/api/download/processed', async (req, res) => {
  const csvContent = await exportProcessedToCsv();
   res.setHeader('Content-Type', 'text/csv');
-  res.setHeader('Content-Disposition', 'attachment; filename=accepted.csv');
+  res.setHeader('Content-Disposition', 'attachment; filename=processed.csv');
   res.send(csvContent);
 });
 
