@@ -19,6 +19,7 @@ app.use('/images', express.static(imagesPath));
 // app.use('/images', express.static('images'));
 const buildPath = path.join(__dirname, '..', 'UI', 'web-build');
 // app.use(express.static(path.join(__dirname, 'web-build')));
+console.log('Serving builds from:', buildPath);
 app.use(express.static(buildPath));
 
 // API Routes
