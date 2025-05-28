@@ -80,57 +80,34 @@ async function hasBeenProcessed(combo) {
 
 
 
-async function writeProcessed(combo) {
-  const filePath = path.resolve('processed.csv');
-
-  // Check if file exists and size > 0
-  const fileExists = fs.existsSync(filePath);
-  const fileHasContent = fileExists && fs.statSync(filePath).size > 0;
-
-  const writer = createCsvWriter({
-    path: filePath,
-    header: headers,
-    append: fileHasContent, // append if file has content, else create new with header
-  });
-
-  await writer.writeRecords([formatCombo(combo)]);
-}
 
 async function writeAccepted(combo) {
   const filePath = path.resolve('accepted.csv');
-
-  const fileExists = fs.existsSync(filePath);
-  const fileHasContent = fileExists && fs.statSync(filePath).size > 0;
+  ensureHeader(filePath);
 
   const writer = createCsvWriter({
     path: filePath,
     header: headers,
-    append: fileHasContent,
+    append: true,
+  });
+
+  await writer.writeRecords([formatCombo(combo)]);
+}
+
+async function writeProcessed(combo) {
+  const filePath = path.resolve('processed.csv');
+  ensureHeader(filePath);
+
+  const writer = createCsvWriter({
+    path: filePath,
+    header: headers,
+    append: true,
   });
 
   await writer.writeRecords([formatCombo(combo)]);
 }
 
 
-function convertToCSV(data) {
-  if (data.length === 0) return '';
-  
-  const headers = Object.keys(data[0]);
-  const csvContent = [
-    headers.join(','),
-    ...data.map(row => 
-      headers.map(header => {
-        const value = row[header];
-        // Escape commas and quotes in CSV
-        return typeof value === 'string' && (value.includes(',') || value.includes('"')) 
-          ? `"${value.replace(/"/g, '""')}"` 
-          : value;
-      }).join(',')
-    )
-  ].join('\n');
-  
-  return csvContent;
-}
 
 async function exportProcessedToCsv() {
   try {
@@ -176,7 +153,6 @@ module.exports = {
   hasBeenProcessed,
   writeProcessed,
   writeAccepted,
-  convertToCSV,
   exportProcessedToCsv,
   exportAcceptedToCsv
 
