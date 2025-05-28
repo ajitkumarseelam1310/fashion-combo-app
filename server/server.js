@@ -12,7 +12,7 @@ console.log('Current __dirname:', __dirname);
 console.log('Current working directory (process.cwd()):', process.cwd());
 
 // Serve static files
-const imagesPath = path.join(__dirname, '..', 'images');
+const imagesPath = path.join(__dirname, 'server', 'images');
 console.log('Serving images from:', imagesPath);
 app.use('/images', express.static(imagesPath));
 // app.use('/images', express.static('images'));
