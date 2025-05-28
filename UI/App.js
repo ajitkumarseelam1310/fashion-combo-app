@@ -1,10 +1,8 @@
-
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, TouchableOpacity, ScrollView, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, Image, TouchableOpacity, ScrollView, ActivityIndicator, StyleSheet, useWindowDimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
-// const API_URL = 'http://localhost:3000/api'; // Adjust if needed
-const API_URL = '/api';
+const API_URL = '/api'; // Adjust if needed
 const categories = ['top', 'bottom', 'handbag', 'accessories', 'shoes'];
 
 export default function App() {
@@ -12,6 +10,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [decisionMade, setDecisionMade] = useState(false);
+  const { width } = useWindowDimensions();
 
   const fetchCombination = async () => {
     setLoading(true);
@@ -27,12 +26,10 @@ export default function App() {
     }
   };
 
-  // Handle accept or reject for whole combination
   const handleDecision = async (decision) => {
-    if (decisionMade) return; // prevent double click
+    if (decisionMade) return;
     setDecisionMade(true);
 
-    // Build decisions object for all categories same decision
     const decisions = {};
     categories.forEach(cat => {
       decisions[cat] = decision;
@@ -47,7 +44,6 @@ export default function App() {
           decisions,
         }),
       });
-      // Fetch next combo
       fetchCombination();
     } catch (error) {
       console.error('Submission error:', error);
@@ -55,14 +51,11 @@ export default function App() {
     }
   };
 
-  // Download helper
-
-
   const handleDownloadBoth = () => {
     window.open('/api/download/processed', '_blank');
-    
+    setTimeout(() => {
       window.open('/api/download/accepted', '_blank');
-    
+    }, 100);
   };
 
   useEffect(() => {
@@ -81,6 +74,10 @@ export default function App() {
     </View>
   );
 
+  // Calculate card widths based on screen width with minimal gaps
+  const cardWidth = width * 0.29;  // ~3 cards per row with small margins
+  const doubleCardWidth = width * 0.44; // ~2 cards per row wider cards
+
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
@@ -88,15 +85,25 @@ export default function App() {
         <Text style={styles.headerText}>Fashion Combo App</Text>
       </View>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.gridContainer}>
-          {categories.map((cat, i) => (
-            <View
-              key={cat}
-              style={[
-                styles.card,
-                (i === 3 || i === 4) && styles.cardDouble, // last 2 images wider
-              ]}
-            >
+
+        {/* 3 cards in first row */}
+        <View style={styles.row3}>
+          {categories.slice(0, 3).map(cat => (
+            <View key={cat} style={[styles.card, { width: cardWidth }]}>
+              <Image
+                source={{ uri: images[cat]?.url }}
+                style={styles.image}
+                resizeMode="contain"
+              />
+              <Text style={styles.label}>{cat}</Text>
+            </View>
+          ))}
+        </View>
+
+        {/* 2 cards in second row */}
+        <View style={styles.row2}>
+          {categories.slice(3).map(cat => (
+            <View key={cat} style={[styles.card, { width: doubleCardWidth }]}>
               <Image
                 source={{ uri: images[cat]?.url }}
                 style={styles.image}
@@ -149,7 +156,7 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: 20,
-    backgroundColor: '#1F2937', // dark slate gray
+    backgroundColor: '#1F2937',
     alignItems: 'center',
   },
   headerText: {
@@ -158,29 +165,29 @@ const styles = StyleSheet.create({
     color: '#60A5FA',
   },
   scrollContainer: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
     paddingTop: 20,
     paddingBottom: 40,
   },
-  gridContainer: {
+
+  row3: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
+    justifyContent: 'space-between', // close spacing
+    width: '100%',
+    marginBottom: 15,
+  },
+  row2: {
+    flexDirection: 'row',
     justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: 15,
   },
   card: {
-    width: '30%',
-    marginBottom: 20,
     backgroundColor: '#1E293B',
     borderRadius: 14,
-    padding: 10,
+    padding: 8,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.8,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 3 },
-  },
-  cardDouble: {
-    width: '45%',
+    marginHorizontal: 4, // small gap between cards
   },
   image: {
     width: '100%',
@@ -211,10 +218,10 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 3 },
   },
   acceptButton: {
-    backgroundColor: '#16A34A', // green
+    backgroundColor: '#16A34A',
   },
   rejectButton: {
-    backgroundColor: '#DC2626', // red
+    backgroundColor: '#DC2626',
   },
   decisionText: {
     color: '#fff',
