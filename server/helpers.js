@@ -47,7 +47,7 @@ const getRandomFromFolder = (folder) => {
   const files = fs.readdirSync(folderPath).filter(f => f.match(/\.(jpg|png|jpeg)$/));
   if (files.length === 0) return null;
   const file = files[Math.floor(Math.random() * files.length)];
-  return { filename: file, url: `http://localhost:3000/images/${path.basename(folder)}/${file}` };
+  return { filename: file, url: `/images/${path.basename(folder)}/${file}` };
 };
 
 function getRandomCombination() {
