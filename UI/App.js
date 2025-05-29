@@ -53,9 +53,9 @@ export default function App() {
 
   const handleDownloadBoth = () => {
     window.open('/api/download/processed', '_blank');
-    setTimeout(() => {
+
       window.open('/api/download/accepted', '_blank');
-    }, 100);
+
   };
 
   useEffect(() => {
